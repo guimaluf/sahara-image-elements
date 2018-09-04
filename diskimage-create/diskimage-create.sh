@@ -37,6 +37,7 @@ usage() {
     echo "         [-s 1.6.0|2.1.0|2.2.0|2.3.0]"
     echo "         [-t 1.0.1|1.1.0|1.1.1|1.2.0|1.2.1]"
     echo "         [-f qcow2|raw]"
+    echo "         [-e]"
     echo "         [-d]"
     echo "         [-u]"
     echo "         [-j openjdk|oracle-java]"
@@ -54,6 +55,7 @@ usage() {
     echo "   '-j' is java distribution (default: openjdk)"
     echo "   '-x' turns on tracing"
     echo "   '-b' generate a bare metal image"
+    echo "   '-e' extra elements"
     echo "   '-h' display this message"
     echo
     echo "You shouldn't specify image type for spark plugin"
@@ -63,7 +65,7 @@ usage() {
     echo
 }
 
-while getopts "p:i:v:f:dur:s:t:j:xhb" opt; do
+while getopts "p:i:v:f:dur:s:t:j:xhb:e:" opt; do
     case $opt in
         p)
             PLUGIN=$OPTARG
@@ -101,6 +103,9 @@ while getopts "p:i:v:f:dur:s:t:j:xhb" opt; do
         ;;
         b)
             SIE_BAREMETAL="true"
+        ;;
+        e)
+            EXTRA_ELEMENTS=$OPTARG
         ;;
         h)
             usage
@@ -446,7 +451,7 @@ image_create() {
         esac
     fi
 
-    disk-image-create $IMAGE_FORMAT $TRACING -o "$output" $args "$distro" $elements "$@"
+    disk-image-create $IMAGE_FORMAT $TRACING -o "$output" $args "$distro" $elements "$@" $EXTRA_ELEMENTS
 }
 
 set_hive_version() {
