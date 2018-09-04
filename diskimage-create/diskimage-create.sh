@@ -36,6 +36,7 @@ usage() {
     echo "         [-r 5.1.0|5.2.0]"
     echo "         [-s 1.3.1|1.6.0|2.1.0]"
     echo "         [-t 0.9.2|1.0.1|1.1.0]"
+    echo "         [-e]"
     echo "         [-d]"
     echo "         [-u]"
     echo "         [-j openjdk|oracle-java]"
@@ -52,6 +53,7 @@ usage() {
     echo "   '-j' is java distribution (default: openjdk)"
     echo "   '-x' turns on tracing"
     echo "   '-b' generate a bare metal image"
+    echo "   '-e' extra elements"
     echo "   '-h' display this message"
     echo
     echo "You shouldn't specify image type for spark plugin"
@@ -61,7 +63,7 @@ usage() {
     echo
 }
 
-while getopts "p:i:v:dur:s:t:j:xhb" opt; do
+while getopts "p:i:v:dur:s:t:j:xhb:e:" opt; do
     case $opt in
         p)
             PLUGIN=$OPTARG
@@ -96,6 +98,9 @@ while getopts "p:i:v:dur:s:t:j:xhb" opt; do
         ;;
         b)
             SIE_BAREMETAL="true"
+        ;;
+        e)
+            EXTRA_ELEMENTS=$OPTARG
         ;;
         h)
             usage
@@ -472,7 +477,7 @@ image_create() {
         ;;
     esac
 
-    disk-image-create $TRACING -o "$output" $args "$distro" $elements "$@"
+    disk-image-create $TRACING -o "$output" $args "$distro" $elements "$@" $EXTRA_ELEMENTS
 
     # cleanup
     case "$distro" in
