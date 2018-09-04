@@ -336,14 +336,22 @@ fi
 #################
 
 is_installed() {
-    if [ "$platform" = 'ubuntu' ]; then
-        dpkg -s "$1" &> /dev/null
-    else
-        # centos, fedora, opensuse, or rhel
-        if ! rpm -q "$1" &> /dev/null; then
-            rpm -q "$(rpm -q --whatprovides "$1")"
-        fi
-    fi
+    case "$platform" in
+        "ubuntu")
+            dpkg -s "$1" &> /dev/null
+            ;;
+        "fedora"|"opensuse"|"rhel"|"centos")
+            rpm -q "$1" &> /dev/null \
+            || rpm -q "$(rpm -q --whatprovides "$1")" &> /dev/null
+            ;;
+        "gentoo")
+            equery list "$1" &> /dev/null
+            ;;
+        *)
+            echo -e "Unknown platform '$platform' for the package list.\nAborting"
+            exit 2
+            ;;
+    esac
 }
 
 need_required_packages() {
@@ -364,6 +372,9 @@ need_required_packages() {
                 package_list="$package_list python-argparse"
             fi
             ;;
+        "gentoo")
+            package_list="dev-vcs/git app-emulation/qemu sys-fs/multipath-tools"
+          ;;
         *)
             echo -e "Unknown platform '$platform' for the package list.\nAborting"
             exit 2
@@ -395,6 +406,8 @@ if need_required_packages; then
                     sudo rpm -Uvh --force http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
                 fi
                 sudo yum install $package_list -y
+            "gentoo")
+                sudo emerge -vq $package_list
                 ;;
             *)
                 echo -e "Unknown platform '$platform' for installing packages.\nAborting"
