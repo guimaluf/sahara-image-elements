@@ -1,0 +1,29 @@
+#!/bin/bash
+# This script installs SparkBench
+# More documentation in the README.md file
+
+if [ "${DIB_DEBUG_TRACE:-0}" -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+tmp_dir=/tmp/spark-bench
+pushd $tmp_dir
+
+
+echo "Extracting SparkBench"
+spark_bench_url=$(cat spark_bench_url.txt)
+spark_bench_file=$(basename $spark_bench_url)
+extract_folder=$(tar tzf $spark_bench_file | sed -e 's@/.*@@' | uniq)
+echo "Decompressing SparkBench..."
+tar xzf $spark_bench_file
+rm $spark_bench_file
+
+echo "Moving SparkBench to /opt/"
+# Placing spark bench in /opt/spark-bench
+mv $extract_folder /opt/spark-bench
+mv spark_bench_url.txt /opt/spark-bench
+
+popd
+rm -Rf $tmp_dir
