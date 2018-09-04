@@ -327,14 +327,22 @@ fi
 #################
 
 is_installed() {
-    if [ "$platform" = 'ubuntu' ]; then
-        dpkg -s "$1" &> /dev/null
-    else
-        # centos, fedora, opensuse, or rhel
-        if ! rpm -q "$1" &> /dev/null; then
-            rpm -q "$(rpm -q --whatprovides "$1")"
-        fi
-    fi
+    case "$platform" in
+        "ubuntu")
+            dpkg -s "$1" &> /dev/null
+            ;;
+        "fedora"|"opensuse"|"rhel"|"centos")
+            rpm -q "$1" &> /dev/null \
+            || rpm -q "$(rpm -q --whatprovides "$1")" &> /dev/null
+            ;;
+        "gentoo")
+            equery list "$1" &> /dev/null
+            ;;
+        *)
+            echo -e "Unknown platform '$platform' for the package list.\nAborting"
+            exit 2
+            ;;
+    esac
 }
 
 need_required_packages() {
@@ -351,6 +359,9 @@ need_required_packages() {
         "rhel" | "centos")
             package_list="qemu-kvm qemu-img kpartx git"
             ;;
+        "gentoo")
+            package_list="dev-vcs/git app-emulation/qemu sys-fs/multipath-tools"
+          ;;
         *)
             echo -e "Unknown platform '$platform' for the package list.\nAborting"
             exit 2
@@ -375,6 +386,9 @@ if need_required_packages; then
                 ;;
             "opensuse")
                 sudo zypper --non-interactive --gpg-auto-import-keys in $package_list
+                ;;
+            "gentoo")
+                sudo emerge -vq $package_list
                 ;;
             *)
                 echo -e "Unknown platform '$platform' for installing packages.\nAborting"
