@@ -9,7 +9,7 @@ set -o pipefail
 tmp_dir=$TARGET_ROOT/tmp/spark-bench
 mkdir -p $tmp_dir
 
-SPARK_BENCH_DOWNLOAD_URL="https://github.com/CODAIT/spark-bench/archive/v99.tar.gz"
+SPARK_BENCH_DOWNLOAD_URL="https://github.com/CODAIT/spark-bench/releases/download/v99/spark-bench_2.3.0_0.4.0-RELEASE_99.tgz"
 
 echo "Downloading SPARK"
 spark_bench_file=$(basename "$SPARK_BENCH_DOWNLOAD_URL")
