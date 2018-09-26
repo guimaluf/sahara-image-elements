@@ -15,9 +15,9 @@ pushd $tmp_dir
 echo "Extracting SparkBench"
 spark_bench_url=$(cat spark_bench_url.txt)
 spark_bench_file=$(basename $spark_bench_url)
-extract_folder=$(tar tzf $spark_bench_file | head -n1)
+extract_folder=./spark-bench_2.3.0_0.4.0-RELEASE/
 echo "Decompressing SparkBench..."
-tar xzf $spark_bench_file
+tar -xzf $spark_bench_file
 rm $spark_bench_file
 
 echo "Moving SparkBench to /opt/"
